@@ -1,0 +1,90 @@
+﻿<nav class="flex-column">
+
+    <div class="nav-item px-3">
+        <NavLink class="nav-link"
+                 href=""
+                 Match="NavLinkMatch.All"
+                 @onclick="HandleNavigate">
+            <span class="bi bi-house-door-fill me-2"></span>
+            Home
+        </NavLink>
+    </div>
+
+    <div class="nav-item px-3">
+        <NavLink class="nav-link"
+                 href="counter"
+                 @onclick="HandleNavigate">
+            <span class="bi bi-plus-square-fill me-2"></span>
+            Counter
+        </NavLink>
+    </div>
+
+    <div class="nav-item px-3">
+        <NavLink class="nav-link"
+                 href="weather"
+                 @onclick="HandleNavigate">
+            <span class="bi bi-cloud-sun-fill me-2"></span>
+            Weather
+        </NavLink>
+    </div>
+
+    <div class="nav-item px-3">
+        <NavLink class="nav-link"
+                 href="patients"
+                 @onclick="HandleNavigate">
+            <span class="bi bi-chat-dots-fill me-2"></span>
+            Patients
+        </NavLink>
+    </div>
+
+    <div class="nav-item px-3">
+        <NavLink class="nav-link"
+                 href="dentists"
+                 @onclick="HandleNavigate">
+            <span class="bi bi-person-plus-fill me-2"></span>
+            Dentists
+        </NavLink>
+    </div>
+
+    <div class="nav-item px-3">
+        <NavLink class="nav-link"
+                 href="appointments"
+                 @onclick="HandleNavigate">
+            <span class="bi bi-whatsapp me-2"></span>
+            Appointments
+        </NavLink>
+    </div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link"
+                 href="report"
+                 @onclick="HandleNavigate">
+            <span class="bi bi-whatsapp me-2"></span>
+            Report
+        </NavLink>
+    </div>
+
+    <div class="nav-item px-3">
+        <NavLink class="nav-link"
+                 href="customer"
+                 @onclick="HandleNavigate">
+            <span class="bi bi-people-fill me-2"></span>
+            Customer
+        </NavLink>
+    </div>
+
+</nav>
+
+@code {
+
+    [Parameter]
+    public EventCallback OnNavigate { get; set; }
+
+    private async Task HandleNavigate()
+    {
+        if (OnNavigate.HasDelegate)
+        {
+            await OnNavigate.InvokeAsync();
+        }
+    }
+
+}

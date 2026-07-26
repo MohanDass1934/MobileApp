@@ -1,0 +1,112 @@
+﻿@* @page "/error"
+
+<h3 class="mb-3 text-danger">Error</h3>
+
+@if (errorMessage != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>@errorMessage</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        An unexpected error has occurred. Please try again later.
+    </div>
+}
+
+<div class="card mt-3">
+    <div class="card-body">
+        <h5 class="card-title">What to do?</h5>
+        <ul class="list-unstyled">
+            <li class="mb-2">
+                <i class="bi bi-arrow-left-circle me-2 text-primary"></i>
+                <a href="/" class="text-decoration-none">Return to Home</a>
+            </li>
+            <li class="mb-2">
+                <i class="bi bi-arrow-counterclockwise me-2 text-success"></i>
+                <button class="btn btn-link text-decoration-none p-0" @onclick="ReloadPage">Refresh the page</button>
+            </li>
+            <li>
+                <i class="bi bi-envelope me-2 text-info"></i>
+                <a href="mailto:support@example.com" class="text-decoration-none">Contact Support</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+@if (showDetails && errorDetails != null)
+{
+    <div class="card mt-3">
+        <div class="card-header">
+            <button class="btn btn-sm btn-outline-secondary" @onclick="ToggleDetails">
+                <i class="bi bi-chevron-down"></i> Error Details
+            </button>
+        </div>
+        <div class="card-body">
+            <pre class="bg-light p-3 rounded" style="white-space: pre-wrap; word-break: break-all;">
+                <code>@errorDetails</code>
+            </pre>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    [Parameter]
+    public string? ErrorDetails { get; set; }
+
+    private string? errorMessage;
+    private string? errorDetails;
+    private bool showDetails = false;
+
+    protected override void OnParametersSet()
+    {
+        errorMessage = ErrorMessage;
+        errorDetails = ErrorDetails;
+    }
+
+    private void ReloadPage()
+    {
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+
+    private void ToggleDetails()
+    {
+        showDetails = !showDetails;
+    }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+} *@
+
+@page "/404"
+
+<div class="container text-center py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="mb-4">
+                <i class="bi bi-exclamation-octagon-fill" style="font-size: 5rem; color: #ffc107;"></i>
+            </div>
+            <h1 class="display-1 fw-bold text-muted">404</h1>
+            <h2 class="mb-3">Page Not Found</h2>
+            <p class="text-muted mb-4">
+                The page you are looking for might have been removed, had its name changed,
+                or is temporarily unavailable.
+            </p>
+            <a href="/" class="btn btn-primary btn-lg">
+                <i class="bi bi-house-fill me-2"></i> Go to Home
+            </a>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+}

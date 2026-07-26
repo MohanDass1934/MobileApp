@@ -1,0 +1,78 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #eef3f9;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Header */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(90deg,#2563eb,#3b82f6);
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    box-shadow: 0 5px 15px rgba(0,0,0,.15);
+    z-index: 1000;
+}
+
+.menu-btn {
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.title {
+    margin-left: 15px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Glass Drawer */
+
+.drawer {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    padding-top: 70px;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-right: 1px solid rgba(255,255,255,.3);
+    box-shadow: 8px 0 30px rgba(0,0,0,.15);
+    transition: .35s ease;
+    z-index: 1001;
+}
+
+    .drawer.show {
+        left: 0;
+    }
+
+/* Overlay */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+   /* background: rgba(0,0,0,.35);*/
+    z-index: 999;
+}
+
+/* Content */
+
+.page-content {
+    padding: 75px 15px 20px;
+}

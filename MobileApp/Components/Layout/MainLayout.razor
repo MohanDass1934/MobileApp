@@ -1,0 +1,33 @@
+﻿@inherits LayoutComponentBase
+
+<div class="header">
+    <button class="menu-btn" @onclick="ToggleMenu" aria-label="Toggle menu">
+        @(isMenuOpen ? "✕" : "☰")
+    </button>
+    <span class="title">Mobile App</span>
+</div>
+
+@if (isMenuOpen)
+{
+    <div class="overlay" @onclick="CloseMenu"></div>
+}
+
+<div class="drawer @(isMenuOpen ? "show" : "")">
+    <NavMenu OnNavigate="CloseMenu" />
+</div>
+
+<div class="page-content">
+    @Body
+</div>
+
+@code {
+    bool isMenuOpen;
+
+    void ToggleMenu() => isMenuOpen = !isMenuOpen;
+
+    void CloseMenu()
+    {
+        isMenuOpen = false;
+        StateHasChanged();
+    }
+}

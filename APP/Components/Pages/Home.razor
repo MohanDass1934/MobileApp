@@ -1,0 +1,16 @@
+﻿@page "/"
+<h2>
+    Hello World !
+</h2>
+<Button OnClick="@displayingalrt">dis</Button>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+    }
+    public void displayingalrt()
+    {
+        AlertService.ShowSuccess("Hello World");
+        message.Error("Faild to load");
+    }
+}

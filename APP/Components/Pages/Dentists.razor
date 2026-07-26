@@ -1,0 +1,241 @@
+﻿@page "/dentists"
+
+@using APP.Model
+@using System.Net.Http.Json
+@using System.Text.Json
+@using AntDesign
+
+@* If Http, message, or AlertService are ALREADY injected globally in _Imports.razor,
+   remove the matching line below — duplicate @inject for the same type/name
+   will fail to compile. *@
+
+<h3>Dentists</h3>
+
+<EditForm Model="dentist" OnValidSubmit="Save">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row g-2 mb-3">
+        <div class="col-md-3 col-sm-6">
+            <input class="form-control" @bind="dentist.DentistCode" placeholder="Dentist Code" required />
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <input class="form-control" @bind="dentist.FullName" placeholder="Full Name" required />
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <input class="form-control" @bind="dentist.Phone" placeholder="Phone" />
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <input class="form-control" @bind="dentist.Email" placeholder="Email" type="email" />
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <input class="form-control" @bind="dentist.Specialization" placeholder="Specialization" />
+        </div>
+        <div class="col-md-8 col-sm-6">
+            <input class="form-control" @bind="dentist.Bio" placeholder="Bio" />
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <input class="form-control" @bind="dentist.ProfilePhoto" placeholder="Profile Photo URL" />
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit" disabled="@isSaving">
+        @(isSaving ? "Saving..." : (isEditing ? "Update" : "Save"))
+    </button>
+    @if (isEditing)
+    {
+        <button class="btn btn-secondary ms-2" type="button" @onclick="CancelEdit">Cancel</button>
+    }
+</EditForm>
+
+<hr />
+
+@if (isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else if (list == null || list.Count == 0)
+{
+    <p><em>No dentists found.</em></p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Specialization</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in list)
+                {
+                    <tr>
+                        <td>@item.DentistCode</td>
+                        <td>@item.FullName</td>
+                        <td>@item.Phone</td>
+                        <td>@item.Email</td>
+                        <td>@item.Specialization</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" @onclick="() => Edit(item)">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger ms-1" @onclick="() => Delete(item)">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private static readonly JsonSerializerOptions JsonOpts = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    Dentist dentist = new();
+    List<Dentist> list = new();
+    bool isEditing = false;
+    bool isLoading = true;
+    bool isSaving = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        try
+        {
+            isLoading = true;
+
+            var response = await Http.GetFromJsonAsync<ApiListResponse<List<Dentist>>>(
+                "get_dentists.php", JsonOpts);
+
+            if (response is { Status: true })
+                list = response.Data ?? new List<Dentist>();
+            else
+                message.Warning($"Failed to load dentists. {response?.Message}");
+        }
+        catch (Exception ex)
+        {
+            AlertService.ShowError("Error loading dentists:", ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    void Edit(Dentist item)
+    {
+        dentist = new Dentist
+        {
+            DentistId = item.DentistId,
+            DentistCode = item.DentistCode,
+            FullName = item.FullName,
+            Phone = item.Phone,
+            Email = item.Email,
+            Specialization = item.Specialization,
+            Bio = item.Bio,
+            ProfilePhoto = item.ProfilePhoto
+        };
+        isEditing = true;
+    }
+
+    void CancelEdit()
+    {
+        dentist = new();
+        isEditing = false;
+    }
+
+    async Task Save()
+    {
+        if (isSaving) return;
+
+        try
+        {
+            isSaving = true;
+
+            HttpResponseMessage response = isEditing
+                ? await Http.PostAsJsonAsync("update_dentist.php", dentist, JsonOpts)
+                : await Http.PostAsJsonAsync("add_dentist.php", dentist, JsonOpts);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse>(JsonOpts);
+                if (result is { Status: true })
+                {
+                    dentist = new();
+                    isEditing = false;
+                    await LoadData();
+                }
+                else
+                {
+                     message.Warning($"Failed to save dentist. {result?.Message}");
+                }
+            }
+            else
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                 message.Warning($"Failed to save dentist. Status code: {response.StatusCode}. {body}");
+            }
+        }
+        catch (Exception ex)
+        {
+            AlertService.ShowError("Error saving dentist:", ex.Message);
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    async Task Delete(Dentist item)
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("delete_dentist.php", new { Id = item.DentistId });
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse>(JsonOpts);
+                if (result is { Status: true })
+                    await LoadData();
+                else
+                     message.Warning($"Failed to delete dentist. {result?.Message}");
+            }
+            else
+            {
+                var body = await response.Content.ReadAsStringAsync();
+
+                AlertService.ShowError(
+                    response.StatusCode.ToString(),
+                    body
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            AlertService.ShowError("Error deleting dentist:", ex.Message);
+        }
+    }
+
+    public class ApiResponse
+    {
+        public bool Status { get; set; }
+        public string? Message { get; set; }
+    }
+
+    public class ApiListResponse<T>
+    {
+        public bool Status { get; set; }
+        public string? Message { get; set; }
+        public T? Data { get; set; }
+    }
+}
