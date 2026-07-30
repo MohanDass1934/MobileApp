@@ -1,0 +1,176 @@
+﻿@page "/patient"
+@using APP.Model
+@using System.Net.Http.Json
+@using System.Text.Json
+<header class="app-header d-flex align-items-center justify-content-between px-3">
+    <div class="brand d-flex align-items-center gap-2">
+        <i class="bi bi-heart-pulse-fill"></i>
+        <span>Patients</span>
+    </div>
+    <div class="header-search-wrap">
+        @if (showSearch)
+        {
+            <input class="search-box"
+                   placeholder="Search name or mobile..."
+                   @bind="searchText"
+                   @bind:event="oninput"
+                   autofocus />
+            <a class="header-search-icon" @onclick="CloseSearch">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        }
+        else
+        {
+            <a class="header-search-icon" @onclick="() => showSearch = true">
+                <i class="bi bi-search"></i>
+            </a>
+        }
+    </div>
+</header>
+@if (isLoading)
+{
+    <div class="d-flex flex-column align-items-center justify-content-center py-5 text-muted">
+        <div class="spinner-border text-primary mb-2" role="status" style="width:2rem;height:2rem;"></div>
+        <span>Loading patients...</span>
+    </div>
+}
+else if (FilteredPatients.Count() == 0)
+{
+    <div class="text-center mt-5 text-muted">
+        <i class="bi bi-person-x" style="font-size: 2.5rem; color: #c3ccd8;"></i>
+        <h5 class="mt-2">No Patient Found</h5>
+        <p class="small">Try a different name or mobile number.</p>
+    </div>
+}
+else
+{
+    <div class="patient-list">
+        @foreach (var item in FilteredPatients)
+        {
+            <div class="card patient-card mb-2 border-0 shadow-sm" @onclick="() => SelectPatient(item)">
+                <div class="card-body d-flex align-items-center justify-content-between py-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-circle">
+                            @GetInitials(item.PatientName)
+                        </div>
+                        <div>
+                            <div class="fw-bold" style="color:#12233f; font-size:1.05rem;">
+                                @item.PatientName
+                            </div>
+                            <div class="text-muted d-flex align-items-center gap-1" style="font-size:0.88rem;">
+                                <i class="bi bi-telephone-fill" style="font-size:0.75rem;"></i>
+                                @item.MobileNo
+                            </div>
+                        </div>
+                    </div>
+                  
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .search-box {
+        border-radius: 14px;
+    }
+
+        .search-box:focus-within {
+            border-color: #2563eb !important;
+            border-radius: 14px;
+        }
+
+    .patient-card {
+        border-radius: 14px;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        background: #ffffff;
+    }
+
+        .patient-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(20, 40, 80, 0.08) !important;
+        }
+
+    .avatar-circle {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563eb, #1e40af);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.5px;
+    }
+
+    .select-btn {
+        border-radius: 8px;
+        padding: 0.35rem 1rem;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .patient-list {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
+@code {
+    private static readonly JsonSerializerOptions JsonOpts = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    List<Patient> list = new();
+    string searchText = "";
+    bool isLoading = true;
+    bool showSearch = false;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        isLoading = true;
+        var response = await Http.GetFromJsonAsync<ApiListResponse<List<Patient>>>(
+            "get_patients.php",
+            JsonOpts);
+        if (response is { Status: true })
+            list = response.Data ?? new();
+        isLoading = false;
+    }
+
+    IEnumerable<Patient> FilteredPatients =>
+        string.IsNullOrWhiteSpace(searchText)
+            ? list
+            : list.Where(x =>
+                (!string.IsNullOrWhiteSpace(x.PatientName) &&
+                 x.PatientName.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                ||
+                (!string.IsNullOrWhiteSpace(x.MobileNo) &&
+                 x.MobileNo.Contains(searchText)));
+                 
+    void CloseSearch()
+    {
+        showSearch = false;
+        searchText = "";
+    }
+    string GetInitials(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+        var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0][0].ToString().ToUpper();
+        return (parts[0][0].ToString() + parts[^1][0].ToString()).ToUpper();
+    }
+
+    void SelectPatient(Patient patient)
+    {
+        // Navigate or pass selected patient
+        Navigation.NavigateTo($"/patientoverview/{patient.PatientId}");
+    }
+}

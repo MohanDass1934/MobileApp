@@ -1,19 +1,16 @@
 
-* {
-    margin: 0;
+    /*margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 body {
     background: #eef3f9;
-    font-family: Arial, Helvetica, sans-serif;
-}
+    font-family: Arial, Helvetica, sans-serif;*/
 
 /* Header */
 
-.header {
-    position: fixed;
+    /*position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -38,13 +35,11 @@ body {
 .title {
     margin-left: 15px;
     font-size: 20px;
-    font-weight: 600;
-}
+    font-weight: 600;*/
 
 /* Glass Drawer */
 
-.drawer {
-    position: fixed;
+    /*position: fixed;
     top: 0;
     left: -250px;
     width: 250px;
@@ -60,20 +55,13 @@ body {
 }
 
     .drawer.show {
-        left: 0;
-    }
+        left: 0;*/
 
 /* Overlay */
 
-.overlay {
-    position: fixed;
-    inset: 0;
+    /*position: fixed;*/
     /* background: rgba(0,0,0,.35);*/
-    z-index: 999;
-}
 
 /* Content */
 
-.page-content {
-    padding: 75px 15px 20px;
-}
+    /*padding: 75px 15px 20px;*/

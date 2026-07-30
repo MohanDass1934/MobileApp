@@ -1,4 +1,5 @@
-﻿using Blazored.LocalStorage;
+﻿using APP.Services;
+using Blazored.LocalStorage;
 using Microsoft.Extensions.Logging;
 
 namespace APP
@@ -25,6 +26,7 @@ namespace APP
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddScoped<GlobalModalAlertService>();
+            builder.Services.AddScoped<HeaderService>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

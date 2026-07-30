@@ -7,7 +7,9 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
+        HeaderService.Set("Dentest");
     }
+    public string header = "NAL";
     public void displayingalrt()
     {
         AlertService.ShowSuccess("Hello World");

@@ -1,0 +1,17 @@
+﻿@page "/patienthome"
+<Tabs>
+    <TabPane Tab="Patient List" >
+       <PatientList/>
+    </TabPane>
+    <TabPane Tab="New" >
+        <PatientsPage/>
+    </TabPane>
+</Tabs>
+
+@code{
+    void OnTabChange(string key)
+    {
+        Console.WriteLine($"tab change:{key}");
+    }
+}
+

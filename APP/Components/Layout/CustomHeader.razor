@@ -1,0 +1,76 @@
+﻿@* CustomHeader.razor *@
+<div class="custom-header d-flex align-items-center justify-content-between px-3">
+    <div class="d-flex align-items-center gap-2">
+        <button class="btn-back" @onclick="OnBackClick">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <span class="header-title">@Title</span>
+    </div>
+    <div class="header-actions">
+        @if (!string.IsNullOrEmpty(ActionIcon))
+        {
+            <button class="btn-action" @onclick="OnActionClick">
+                <i class="@ActionIcon"></i>
+            </button>
+        }
+    </div>
+</div>
+
+<style>
+    .custom-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-shadow: 0 4px 20px rgba(0,20,40,0.06);
+        z-index: 1050;
+        border-bottom: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .btn-back, .btn-action {
+        background: none;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 12px;
+        transition: all 0.15s ease;
+        color: #0b1b33;
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+
+        .btn-back:hover, .btn-action:hover {
+            background: #e9f0ff;
+            color: #0d6efd;
+        }
+
+    .header-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #0b1b33;
+        margin-left: 4px;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Back";
+
+    [Parameter]
+    public string? ActionIcon { get; set; }
+
+    [Parameter]
+    public EventCallback OnBackClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnActionClick { get; set; }
+}

@@ -1,0 +1,185 @@
+﻿@page "/add-patient"
+
+@using APP.Model
+@using System.Net.Http.Json
+@using System.Text.Json
+<h3 class="mb-3 text-center">Patient Registration</h3>
+
+<EditForm Model="@patient" OnValidSubmit="Save">
+
+    <div class="mb-3">
+        <label class="form-label ">Full Name</label>
+        <input class="form-control"
+               @bind="patient.PatientName"
+               placeholder="Enter Full Name" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label ">Mobile Number</label>
+        <input class="form-control"
+               @bind="patient.MobileNo"
+               placeholder="Enter Mobile Number"
+               type="tel" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label ">Email Address</label>
+        <input class="form-control"
+               @bind="patient.Email"
+               placeholder="Enter Email Address"
+               type="email" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label ">Date of Birth</label>
+        <input class="form-control"
+               type="date"
+               @bind="patient.DateOfBirth" />
+    </div>
+
+    <div class="mb-4">
+        <label class="form-label ">Gender</label>
+        <select class="form-select" @bind="patient.Gender">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+
+    <div class="d-grid gap-2">
+        <button class="btn btn-primary" type="submit">
+            @(isEditing ? "Update Patient" : "Save Patient")
+        </button>
+
+        @if (isEditing)
+        {
+            <button class="btn btn-outline-secondary "
+                    type="button"
+                    @onclick="CancelEdit">
+                Cancel
+            </button>
+        }
+    </div>
+
+</EditForm>
+
+@code {
+    private static readonly JsonSerializerOptions JsonOpts = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    Patient patient = new();
+    List<Patient> list = new();
+    bool isEditing = false;
+    bool isLoading = true;
+    string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        HeaderService.Set(
+         title: "Add Patient",
+         showBack: true,
+         backUrl: "/patient",
+         headerColor: "#0d6efd",
+         textColor: "#ffffff"
+     );
+
+    }
+
+    // async Task LoadData()
+    // {
+
+    //     isLoading = true;
+    //     errorMessage = null;
+    //     try
+    //     {
+    //         var response = await Http.GetFromJsonAsync<ApiListResponse<List<Patient>>>(
+    //             "get_patients.php", JsonOpts);
+
+    //         if (response is { Status: true })
+    //             list = response.Data ?? new List<Patient>();
+    //         else
+    //             message.Error("Faild to load");
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         AlertService.ShowError("error loading", ex.Message);
+
+    //     }
+    //     finally
+    //     {
+    //         isLoading = false;
+    //     }
+
+
+    // }
+
+    void Edit(Patient item)
+    {
+        // Copy so the form doesn't mutate the list row until Save.
+        patient = new Patient
+        {
+            PatientId = item.PatientId,
+            PatientName = item.PatientName,
+            MobileNo = item.MobileNo,
+            Email = item.Email,
+            DateOfBirth = item.DateOfBirth,
+            Gender = item.Gender,
+            Address = item.Address,
+        };
+        isEditing = true;
+    }
+
+    void CancelEdit()
+    {
+        patient = new();
+        isEditing = false;
+    }
+
+    async Task Save()
+    {
+        errorMessage = null;
+        try
+        {
+            HttpResponseMessage response = isEditing
+                ? await Http.PostAsJsonAsync("update_patient.php", patient)
+                : await Http.PostAsJsonAsync("add_patient.php", patient);
+
+            if (response.IsSuccessStatusCode)
+            {
+                patient = new();
+                isEditing = false;
+                // await LoadData();
+                Navigation.NavigateTo("/patient");
+            }
+            else
+            {
+                AlertService.ShowWarning("Warnning",$"Save failed: {response.StatusCode}");
+                errorMessage = $"Save failed: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            AlertService.ShowError("Error Saving Patient", ex.Message);
+        }
+    }
+
+    // async Task Delete(Patient item)
+    // {
+    //     errorMessage = null;
+    //     try
+    //     {
+    //         var response = await Http.PostAsJsonAsync("delete_patient.php", new { Id = item.PatientId });
+    //         if (response.IsSuccessStatusCode)
+    //             await LoadData();
+    //         else
+    //         AlertService.ShowWarning("Warnning",$"Delete failed: {response.StatusCode}");
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         AlertService.ShowError("Error Deleting Patient", ex.Message);
+    //     }
+    // }
+}

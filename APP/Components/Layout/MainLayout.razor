@@ -1,34 +1,233 @@
-﻿
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
+@using AntDesign
 
-<div class="header">
-    <button class="menu-btn" @onclick="ToggleMenu" aria-label="Toggle menu">
-        @(isMenuOpen ? "✕" : "☰")
-    </button>
-    <span class="title">Mobile App</span>
+<!-- *******************************************
+     DENTEST · MODERN MOBILE LAYOUT (no drawer)
+     ******************************************* -->
+
+<div class="app-shell">
+
+@*     <header class="app-header d-flex align-items-center justify-content-between px-3"
+            style="background:@HeaderService.HeaderColor; color:@HeaderService.TextColor;">
+        <div class="brand d-flex align-items-center gap-2">
+            @if (HeaderService.ShowBack)
+            {
+                <a class="back-btn" style="color:@HeaderService.TextColor;" @onclick="HandleBack">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            }
+            else
+            {
+                <i class="bi bi-heart-pulse-fill"></i>
+            }
+            <div>
+                <span style="color:@HeaderService.TextColor;">@HeaderService.Title</span>
+                @if (!string.IsNullOrEmpty(HeaderService.Subtitle))
+                {
+                    <div class="header-subtitle" style="color:@HeaderService.TextColor; opacity:0.8;">
+                        @HeaderService.Subtitle
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center">
+            @if (HeaderService.RightContent != null)
+            {
+                @HeaderService.RightContent
+            }
+            else
+            {
+                <div class="badge-dent d-flex align-items-center gap-1">
+                    <i class="bi bi-calendar-check"></i> Today · 4
+                </div>
+            }
+        </div>
+    </header> *@
+    <!-- MAIN PAGE CONTENT (no drawer) -->
+    <div class="page-content">
+        @Body
+    </div>
+
+    <!-- BOTTOM NAVIGATION (icon only) -->
+    <nav class="bottom-nav d-flex align-items-center justify-content-around">
+        <NavLink class="nav-item-bottom d-flex align-items-center justify-content-center" href="" Match="NavLinkMatch.All">
+            <i class="bi bi-house"></i>
+        </NavLink>
+        <NavLink class="nav-item-bottom d-flex align-items-center justify-content-center" href="calendar">
+            <i class="bi bi-calendar2-week"></i>
+        </NavLink>
+        <NavLink class="nav-item-bottom d-flex align-items-center justify-content-center position-relative" href="patient">
+            <i class="bi bi-person-badge"></i>
+        </NavLink>
+        <NavLink class="nav-item-bottom d-flex align-items-center justify-content-center" href="settings">
+            <i class="bi bi-gear"></i>
+        </NavLink>
+    </nav>
+
+
 </div>
 
-@if (isMenuOpen)
-{
-    <div class="overlay" @onclick="CloseMenu"></div>
-}
+<!-- *******************************************
+     STYLES (embedded in component)
+     ******************************************* -->
+<style>
+    :root {
+        --header-h: 56px;
+        --nav-h: 56px;
+        --icon-size: 1.4rem;
+        --fab-size: 58px;
+    }
 
-<div class="drawer @(isMenuOpen ? "show" : "")">
-    <NavMenu OnNavigate="CloseMenu" />
-</div>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-<div class="page-content">
-    @Body
-</div>
+    body {
+        background: #f4f7fc;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        padding-bottom: calc(var(--nav-h) + 16px);
+    }
+
+    /* ----- fixed header ----- */
+    .app-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--header-h);
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-shadow: 0 4px 20px rgba(0,20,40,0.06);
+        z-index: 1050;
+        border-bottom: 1px solid rgba(0,0,0,0.02);
+    }
+
+        .app-header .brand i {
+            font-size: 1.5rem;
+            line-height: 1;
+            color: #0d6efd;
+            background: #e9f0ff;
+            padding: 6px;
+            border-radius: 14px;
+        }
+
+        .app-header .brand span {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.3px;
+            color: #0b1b33;
+        }
+
+        .app-header .badge-dent {
+            background: #e9f0ff;
+            color: #0d6efd;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+    /* ----- page content ----- */
+    .page-content {
+        padding: calc(var(--header-h) + 16px) 16px 74px;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    /* ----- bottom navigation (icon only) ----- */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: var(--nav-h);
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border-top: 1px solid rgba(0,0,0,0.04);
+        z-index: 1060;
+        box-shadow: 0 -6px 30px rgba(0,0,0,0.02);
+        padding: 0 6px;
+        border-radius: 50px;
+    }
+
+    .nav-item-bottom {
+        text-decoration: none;
+        color: #0d6efd;
+        transition: 0.2s;
+        border-radius: 40px;
+        background: transparent;
+        border: none;
+        width: 50px;
+        height: 44px;
+    }
+
+        .nav-item-bottom i {
+            font-size: var(--icon-size);
+            line-height: 1;
+            transition: 0.2s;
+        }
+
+        .nav-item-bottom.active {
+            color: #e9f0ff !important;
+        }
+
+            .nav-item-bottom.active i {
+                background: #0d6efd;
+                padding: 11px 11px;
+                border-radius: 40px;
+            }
+
+        /* .nav-item-bottom .badge-dot {
+            position: absolute;
+            top: 2px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #dc3545;
+            border-radius: 20px;
+            border: 2px solid white;
+        }
+ */
+   
+
+    /* hide drawer elements from previous layout */ 
+    .drawer, .overlay, .menu-btn {
+        display: none !important;
+    }
+
+    .card {
+        border-radius: 14px;
+    }
+
+</style>
 
 @code {
-    bool isMenuOpen;
-
-    void ToggleMenu() => isMenuOpen = !isMenuOpen;
-
-    void CloseMenu()
+    protected override void OnInitialized()
     {
-        isMenuOpen = false;
-        StateHasChanged();
+        HeaderService.OnChange += StateHasChanged;
     }
+
+    void HandleBack()
+    {
+        if (HeaderService.BackAction != null)
+        {
+            HeaderService.BackAction.Invoke();
+        }
+        else if (!string.IsNullOrEmpty(HeaderService.BackUrl))
+        {
+            Navigation.NavigateTo(HeaderService.BackUrl);
+        }
+    }
+
+    public void Dispose()
+    {
+        HeaderService.OnChange -= StateHasChanged;
+    }
+   
 }
